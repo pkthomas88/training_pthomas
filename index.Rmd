@@ -11,4 +11,4 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## linx
 
-- [day 1 test] (day1-test-2.html)
+- [day 1 test](day1-test-2.html)
