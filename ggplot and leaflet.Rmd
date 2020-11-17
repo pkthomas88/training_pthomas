@@ -1,0 +1,186 @@
+---
+title: "Data vis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(leaflet)
+library(ggplot2)
+library(dplyr)
+library(leaflet)
+library(tidyr)
+library(scales)
+library(knitr)
+library(DT)
+```
+
+```{r}
+data_url <- "https://knb.ecoinformatics.org/knb/d1/mn/v2/object/urn%3Auuid%3Af119a05b-bbe7-4aea-93c6-85434dcb1c5e"
+
+esc <- tryCatch(
+    read.csv("data/escapement.csv", stringsAsFactors = FALSE),
+    error=function(cond) {
+        message(paste("Escapement file does not seem to exist, so get it from the KNB."))
+        esc <- read.csv(url(data_url, method = "libcurl"), stringsAsFactors = FALSE)
+        return(esc)
+    }
+)
+
+head(esc)
+```
+
+
+huh, I guess the order of group_by matters
+```{r eval=FALSE, include=FALSE}
+annual_esc3 <- esc %>% 
+  separate(sampleDate, c("year", "month", "day", sep = "-")) %>% 
+  mutate(year = as.numeric(year)) %>% 
+  group_by(SASAP.Region, year, Species) %>% 
+  summarize(sum_esc=sum(DailyCount)) %>% 
+  filter(Species %in% c("Sockeye", "Chum", "Pink", "Coho", "Chinook"))
+
+annual_esc2 <- esc %>% 
+  separate(sampleDate, c("year", "month", "day", sep = "-")) %>% 
+  mutate(year = as.numeric(year)) %>% 
+  group_by(Species, SASAP.Region, year) %>% 
+  summarize(sum_esc=sum(DailyCount)) %>% 
+  filter(Species %in% c("Sockeye", "Chum", "Pink", "Coho", "Chinook"))
+
+```
+
+
+```{r}
+annual_esc <- esc %>% 
+  separate(sampleDate, c("Year", "Month", "Day"), sep = "-") %>% 
+  mutate(Year = as.numeric(Year)) %>% 
+  group_by(Species, SASAP.Region, Year) %>% 
+  summarize(escapement = sum(DailyCount)) %>% 
+  filter(Species %in% c("Chinook", "Sockeye", "Chum", "Coho", "Pink"))
+```
+
+```{r}
+ggplot(annual_esc, aes(Species, escapement))+
+  geom_col(fill="dark green")+
+  facet_wrap(~SASAP.Region)
+
+#ggplot(annual_esc, aes(Year, log(escapement), group = Species))+
+ # geom_point()+
+  #geom_smooth()
+
+```
+
+
+this is somehow wrong but the point is you can save your own theme as an object
+```{r}
+kodiak <- filter(annual_esc, SASAP.Region=="Kodiak")
+
+#my_theme <- theme_bw()+
+ # theme(legend.position = "left")+
+
+
+ggplot(kodiak, aes(Year, escapement, color=Species))+
+  geom_point()+
+  geom_smooth()+
+  scale_y_continuous(labels = comma)
+
+
+```
+
+
+
+```{r}
+
+locations <- esc %>% 
+  distinct(Location, Latitude, Longitude) %>% 
+  drop_na()
+```
+
+this from DT package works to make html thing you can search through but need to use kable to make static table for pdf knit
+
+```{r}
+
+datatable(locations)
+
+```
+
+
+```{r}
+
+leaflet(locations) %>% 
+  addTiles() %>% 
+  addMarkers(lng = ~Longitude, lat = ~Latitude, popup = ~Location)
+  
+leaflet(locations) %>% 
+  addTiles() %>% 
+  addMarkers(lng = ~Longitude, lat = ~Latitude, popup = ~ Location)
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
